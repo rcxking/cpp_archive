@@ -1,0 +1,36 @@
+1) The dot "." command lets use repeat the last change.
+2) The x "x" command deletes the character under the cursor.
+3) ">G" increases indentation of the curent line until end of file.
+4) In Normal mode, "0" moves cursor to start of line; "$" moves cursor to the end of line.
+5) "f <char>" moves the cursor to the first instance of <char> in the current line.  If <char> is
+  not found, the cursor stays at its current position.  "F <char> moves the cursor to the previous 
+  instance of <char>.
+6) ";" semicolon repeats the latest f/F, or t/T command <count> times.
+7) The s "s" command deletes the character under the cursor and enters Insert mode.
+8) To search and replace all instances, use: ":s/target/replacement".
+9) The slash "/<term to search>" command searches the file for <term to search>. 
+10) The star "*" command searches for the word under the cursor.
+11) "cw <word>" changes the word underneath the cursor to <word>.
+12) "q:" opens up the VIM command line history window. 
+13) ":shell" opens up a command line window.  Use "exit" to return to VIM.
+14) "<C-w>s" creates two windows of equal height.  "<C-w>v" creates two windows of equal width.
+15) ":edit <filename>" opens <filename> for editing.
+16) ":find <file>" and autotabbing automatically opens files with the <file> substring.
+
+17) ctags is a program that scans a codebase and generates a keyword index. 
+- Install via "sudo apt-get install exuberant-ctags"
+- Run by executing "ctags <regex of files to index>"
+- Use ":set tags?" to show the paths of where VIM looks for a tags file
+- ":!ctags -R" starts from VIM's current working directory and indexes every file recursively
+- ":autocmd BufWritePost * call system("ctags -R")" calls "ctags -R" on every save
+- "Ctrl-]" jumps from the keyword under the cursor to the definition.
+- "Ctrl-t" jumps from a definition to the original file.
+- If multiple function definitions exist, "g-Ctrl-]" brings up a menu to look at multiple tags.
+
+18) ":make" calls the make command in the current directory.  The cursor will jump to the first of 
+  any compiler errors.
+  - Navigate the quickfix table with:
+    ":cnext" and ":cprev" to jump between the next and previous items
+    ":cclose" to close the quickfix window
+19) ":grep <term> *" invokes grep and builds a quickfix table of the results
+
