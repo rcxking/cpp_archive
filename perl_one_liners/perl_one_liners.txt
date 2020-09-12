@@ -1,0 +1,27 @@
+1) Replaces all instances of "you" with "me" in <file>.
+  perl -pi -e 's/you/me/g' <file>
+
+2) Double-spaces a file:
+  perl -pe '$\ = "\n"' <file>
+  perl -pe 'BEGIN { $\ = "\n" }' <file>
+  perl -pe '$_ .= "\n"' <file>
+  perl -pe 's/$/\n/' <file>
+  perl -nE 'say' <file>
+
+3) Double-space a file, excluding blank lines
+  perl -pe '$_ .= "\n" unless /^$/' <file>
+  perl -pe '$_ .= "\n" if /\S/' <file>
+
+4) Triple-space a file
+  perl -pe '$\ = "\n\n"' <file>
+  perl -pe '$_ .= "\n\n"' <file>
+  perl -pe 's/$/\n\n/' <file>
+
+5) N-space a file
+  perl -pe '$_ .= "\n"x7' <file> 
+
+6) Add a blank line before every line
+  perl -pe 's/^/\n/' <file>
+
+7) Remove all blank lines
+  
