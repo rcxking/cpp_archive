@@ -18,10 +18,75 @@
   perl -pe 's/$/\n\n/' <file>
 
 5) N-space a file
-  perl -pe '$_ .= "\n"x7' <file> 
+  perl -pe '$_ .= "\n"x7' <file>
 
 6) Add a blank line before every line
   perl -pe 's/^/\n/' <file>
 
 7) Remove all blank lines
-  
+  perl -ne 'print unless /^$/' <file>
+  perl -lne 'print if length' <file>
+  perl -ne 'print if /\S/' <file>
+
+8) Remove all consecutive blank lines, leaving only one
+  perl -OO -pe '' <file>
+  perl -OOpeO <file>
+
+9) Compress/expand all blank lines into N consecutive lines
+  perl -OO -pe '$_ .= "\n"x2' <file>
+
+10) Double-space between all words
+  perl -pe 's/ /  /g' <file>
+
+11) Remove all spacing between words
+  perl -pe 's/ +//g' <file>
+  perl -pe 's/\s+//g' <file>
+
+12) Change all spacing between words to one space
+  perl -pe 's/ +/ /g' <file>
+
+13) Insert a space between all characters
+  perl -lpe 's// /g' <file>
+
+14) Number all lines in a file
+  perl -pe '$_ = "$. $_"' <file>
+  perl -ne 'print "$. $_"' <file>
+
+15) Number only non-empty lines in a file
+  perl -pe '$_ = ++$x." $_" if /./' <file>
+  perl -pe '$_ = ++$x." $_" if /\S/' <file>
+
+16) Number and print only non-empty lines in a file (drop empty lines)
+  perl -ne 'print ++$x." $_" if /./' <file>
+
+17) Number all lines but print line numbers only for non-empty lines
+  perl -pe '$_ = "$. $_" if /./' <file>
+
+18) Number only lines that match a pattern; print others unmodified
+  perl -pe '$_ = ++$x." $_" if /regex/' <file>
+
+19) Number and print only lines that match a pattern
+  perl -ne 'print ++$x." $_" if /regex/' <file>
+
+20) Number all lines but print line numbers only for lines that match a pattern
+  perl -pe '$_ = "$. $_" if /regex/' <file>
+
+21) Number all lines in a file using a custom format
+  perl -ne 'printf "%-5d %s", $., $_' <file>
+
+22) Print the total number of lines in a file (emulate wc -l)
+  perl -lne 'END { print $. }' <file>
+  perl -le 'print $n = () = <>' <file>
+  perl -le 'print $n = (() = <>)' <file>
+  perl -le 'print scalar(() = <>)' <file>
+  perl -le 'print scalar(@foo = <>)' <file>
+  perl -ne '}{print $.' <file>
+
+23) Print the number of non-empty lines in a file
+  perl -le 'print scalar(grep { /./ } <>)' <file>
+  perl -le 'print ~~grep{/./}<>' <file>
+  perl -le 'print~~grep/./,<>' <file>
+  perl -lE 'say~~grep/./,<>' <file>
+
+24) Print the number of empty lines in a file
+
