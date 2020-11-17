@@ -1,0 +1,8 @@
+Workflow for Compiling and Flashing Embedded C++ Program
+--------------------------------------------------------
+1) C++ Files and Startup Files
+  - Original source code
+2) Compile C++ and assemble startup files -> produces object files (.obj)
+3) Link object files -> produces Map file and absolute object file (.elf)
+4) Extract HEX file from .elf file
+5) Program flash with HEX file and reset microcontroller to begin running.

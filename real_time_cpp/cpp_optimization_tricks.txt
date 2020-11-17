@@ -1,0 +1,269 @@
+C++ Optimization Tricks for Real-Time Systems
+---------------------------------------------
+1) Declare local variables when used.  This helps with code readability and
+compiler optimization.
+
+2) Fixed-size integer types can be found within the <cstdint> header.  This
+includes types such as std::uint8_t, std::uint16_t, and std::uint32_t; these
+respectively are exactly 8-bits unsigned, 16-bits unsigned, and 32-bits
+unsigned.  There are also types for specifying widths of "at least" a certain
+number of bits; for example "std::uint_least_32_t" means that the variable holds
+at least a 32-bit unsigned value.
+
+There are also macros of the form UINT8_C(), UINT16_C(), UINT32_C(), etc. that
+create values having specified widths.  There are also signed versions of these
+macros.  Example: constexpr std::int16_t value16 = INT16_C(0x7FFF);.  These
+macros are preferred to using suffixes such as U, LL, ULL, etc because they are
+portable across all different architectures.
+
+3) C++ includes a built in boolean type "bool" that only has two values: "true"
+and "false".
+
+4) C++ supports namespaces.  Namespaces are used to improve code readability and
+code organization.
+
+An unnamed/anonymous namespace can be used for file-level localization.
+Example:
+namespace {
+  unsigned local_counter;
+}
+
+As of C++17, there is additional support for nested namespace definitions.  For
+example, to create a nested namespace named "X::Y::Z" prior to C++17, one would
+use:
+
+namespace X {
+  namespace Y {
+    namespace Z {
+      int value;
+    }
+  }
+}
+
+As of C++17, this definition can be replaced with:
+namespace X::Y::Z {
+  int value;
+}
+
+And can be used as such:
+X::Y::Z::value = 1;
+
+5) C-style structures can be replaced with C++ classes or structures with a
+constructor.
+
+6) C++ templates allow the same code to be used for different types.  Templates
+reduce code upkeep efforts and remove redundant sources of errors.
+
+Example: Templated function to compute the sum of two numbers
+template<typename T>
+T add(const T& a, const T& b) {
+  return a + b;
+}
+
+// n is 3
+const int n = add(1, 2);
+
+// f is 4.6
+const float f = add(1.2F, 3.4F);
+
+// s is "abcxyz"
+const std::string s = add(std::string("abc"), std::string("xyz"));
+
+7) "nullptr" replaces "NULL" (since C++11).  This is to avoid possible multiple
+conflicting definitions of NULL.
+
+8) Define constants known at compile-time with "constexpr".  For constant class
+members use "static constexpr" or the older "static const".
+
+// Compile-time constant version number
+constexpr unsigned int version = 3U;
+
+// Compile-time floating point value
+constexpr float pi = 3.1415926535'8979323846F;
+
+// Compile-time constant function of low complexity
+constexpr int three() {
+  return 3;
+}
+
+// Constant array of integers
+constexpr std::array<int, 3U> my_array {
+  { 1, 2, 3 }
+};
+
+struct version_information {
+  // Compile-time constant member variable
+  static constexpr unsigned version = 3U;
+};
+
+9) Use "static_assert" to check boolean expressions known at compile-time.
+These checks are performed only at compile-time.
+
+constexpr unsigned int version = 3U;
+// Print an error if version is less than 2.
+static_assert(version >= 2U, "Version is too low!");
+
+10) The "<limits>" header contains portable numeric limit definitions.
+// This is 31 on a system with 4 byte int.
+// The sign bit is not included in digits.
+constexpr int n_dig = std::numeric_limits<int>::digits;
+
+// This is 2,147,483,647 if int is 4 bytes.
+constexpr int n_max = std::numeric_limits<int>::max();
+
+// Compile-time check if float confirms to IEEE-754.
+static_assert(std::numeric_limits<float>::is_iec559,
+              "float is not IEEE754 conforming!");
+
+constexpr bool is_ieee754_conform = std::numeric_limits<float>::is_iec559;
+
+11) "std::array" is the replacement for C-style arrays.  Since this is part of
+the STL, there is access to the size(), iterators, and standard algorithms.
+
+// Example of a login key stored in an std::array.
+#include <array>
+#include <cstdint>
+constexpr std::array<std::uint8_t, 3U> login_key {
+  {
+    UINT8_C(0x01),
+    UINT8_C(0x02),
+    UINT8_C(0x03)
+  }
+};
+
+12) The <algorithm> header contains access to standard algorithms such as
+std::min()/std::max() and mutating sequence operations such as
+std::fill()/std::copy().
+
+13) The <numeric> header contains numerical algorithms such as std::accumulate()
+and vector operations such as std::inner_product() (vector dot product).
+
+/*
+ * Computes the dot product between the vectors [1, 2, 3] and [4, 5, 6].
+ * This is 1*4 + 2*5 + 3*6 = 32.
+ */
+#include <array>
+#include <numeric>
+
+const std::array<int, 3U> u {
+  { 1, 2, 3 }
+};
+
+const std::array<int, 3U> v {
+  { 4, 5, 6}
+};
+
+const int uv = std::inner_product(u.begin(), u.end(), v.begin(), 0);
+
+14) The <atomic> header contains atomic operations such as std::atomic_load()
+and std::atomic_store().
+
+15) Starting in C++14, digit separators (single quote character) can be used to
+separate groups of digits.
+
+// Example of initializing a 64-bit unsigned integer with the value 1 trillion
+constexpr std::uint64_t one_trillion = UINT64_C(1'000'000'000'000);
+
+16) In C++14, binary literals can be written using prefixes "0b", "0B", "b", or
+"B".
+
+constexpr std::uint8_t one = UINT8_C(0b1);
+constexpr std::uint8_t seven = UINT8_C(0b0000'0111);
+
+17) A user can define literals for custom functions.
+
+/*
+ * Example: User can use user-defined suffixes _inch, _foot, and _yard to
+ * convert between units.
+ */
+inline constexpr float operator"" _inch(long double inches) {
+  return static_cast<float>(inches * 0.0254L);
+}
+
+inline constexpr float operator"" _foot(long double feet) {
+  return static_cast<float>(feet * 0.294L);
+}
+
+inline constexpr float operator"" _yard(long double yards) {
+  return static_cast<float>(yards * 0.9144L);
+}
+
+// Use the suffixes to do conversions.  These are converted to meters at compile
+// time.
+constexpr float one_foot = 12.0_inch;
+constexpr float basketball_player = 7.0_foot;
+constexpr float football_field = 100.0_yard;
+
+In C++14, some user-defined literals were standarized, particularly string
+literals.
+
+Example: C++14 has suffix "s" for character string literals
+#include <string>
+using namespace std::string_literals;
+std::string str = "creativity"s;
+
+The <chrono> library contains standard chronological suffixes such as "h",
+"min", "s", "ms", "us", and "ns":
+
+#include <chrono>
+using namespace std::chrono_literals;
+
+// time_span is 10 milliseconds
+std::chrono::milliseconds time_span = 10ms;
+
+Complex numbers have a standarized suffix for the imaginary part of a complex
+number in the <complex> library:
+
+#include <complex>
+using namespace std::complex_literals;
+std::complex<float> z = 1.2f + 3.4if;
+
+18) Use "alignof()" to check the memory alignment of an entity.  The return
+value is an unsigned integral value of type std::size_t.
+
+auto as = alignof(short);
+auto ai = alignof(int);
+auto aL = alignof(long);
+auto aLL = alignof(long long);
+
+The "alignas()" function can force an entity to be stored with a specified
+memory alignment:
+
+// A timer register set aligned on a 16-byte boundary
+struct alignas(16) timer_register_type {
+  std::uint32_t tmr_ctrl1;
+  std::uint32_t tmr_ctrl2;
+  std::uint32_t tmr_cntr1;
+  std::uint32_t tmr_cntr2;
+};
+
+19) The "final" keyword is used to restrict deriving from another class.
+
+// Base class
+class base {
+public:
+  virtual ~base() {}
+  base& operator=(const base&) = default;
+
+protected:
+  base() {}
+};
+
+// Derived class
+class derived final : public base {
+public:
+  derived() {}
+  virtual ~derived() {}
+  derived& operator=(const derived&) = default;
+};
+
+If another class tries to derive from "derived", an error will be thrown:
+
+// This produces an error
+class derived_another : public derived { };
+
+20) In C++11 and onwards, you can create an alias instead of a typedef:
+
+// These are equivalent
+typedef unsigned int uint_type;
+using uint_type_alias = unsigned int;
